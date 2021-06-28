@@ -4,16 +4,154 @@ import {
     SafeAreaView,
     StyleSheet,
     ScrollView,
-    TextInput
+    TextInput,
+    TouchableOpacity,
+    TouchableWithoutFeedback
 } from 'react-native';
 import { Text, Button, Overlay } from 'react-native-elements';
+import BottomSheet from 'reanimated-bottom-sheet';
+import { Entypo } from '@expo/vector-icons';
+import Animated from 'react-native-reanimated';
 import PopupImage from '../../svg/Popup';
-import { Ionicons } from '@expo/vector-icons';
+import { MaterialIcons } from '@expo/vector-icons';
+import { Ionicons, AntDesign, Foundation } from '@expo/vector-icons';
 import RequestList from '../components/RequestList';
 import NoRequest from '../components/NoRequest';
 
-const Dashboard = ({navigation}:any) => {
+const Dashboard = ({ navigation }: any) => {
+    const sheetRef: any = React.useRef(null);
     const [visible, setVisible] = useState(true);
+
+    const renderHeader = () => (
+        <View
+            style={[
+                {
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    height: 50,
+                    backgroundColor: '#fff',
+                    justifyContent: 'center',
+                    paddingVertical: 10,
+                    shadowColor: '#000',
+                    shadowOffset: { width: 0, height: 3 },
+                    shadowOpacity: 0.5,
+                    shadowRadius: 5,
+                    elevation: 1,
+                    borderTopLeftRadius: 25,
+                    borderTopRightRadius: 25
+                }
+            ]}
+        >
+            <Text style={{ fontSize: 16 }}>Delivery Address</Text>
+        </View>
+    );
+    const renderContent = () => (
+        <View
+            style={{
+                backgroundColor: '#fff',
+                padding: 16,
+                // height: 450,
+                borderBottomLeftRadius: 10,
+                borderBottomRightRadius: 10,
+                shadowColor: '#000000',
+                shadowOffset: { width: 0, height: 2 },
+                shadowOpacity: 0.9,
+                shadowRadius: 3,
+                elevation: 3
+            }}
+        >
+            <TouchableOpacity
+                activeOpacity={0.5}
+                style={[
+                    {
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        borderRadius: 6,
+                        height: 72,
+                        paddingHorizontal: 10,
+                        marginBottom: 10,
+                        backgroundColor: '#fff',
+                        shadowColor: '#000',
+                        shadowOffset: { width: 0, height: 3 },
+                        shadowOpacity: 0.5,
+                        shadowRadius: 6,
+                        elevation: 1
+                    }
+                ]}
+            >
+                <AntDesign
+                    name="edit"
+                    size={24}
+                    color="#DD4335"
+                    style={styles.icon}
+                />
+                <View style={{ flex: 1, marginLeft: 10 }}>
+                    <Text>Email Address</Text>
+                </View>
+                <Entypo name="chevron-small-right" size={20} color="black" />
+            </TouchableOpacity>
+            <TouchableOpacity
+                style={[
+                    {
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        borderRadius: 6,
+                        height: 72,
+                        paddingHorizontal: 10,
+                        marginBottom: 10,
+                        backgroundColor: '#fff',
+                        shadowColor: '#000',
+                        shadowOffset: { width: 0, height: 3 },
+                        shadowOpacity: 0.5,
+                        shadowRadius: 6,
+                        elevation: 1
+                    }
+                ]}
+            >
+                <Foundation
+                    name="address-book"
+                    size={24}
+                    color="#DD4335"
+                    style={styles.icon}
+                />
+                <View style={{ flex: 1, marginLeft: 10 }}>
+                    <Text>Choose from address book</Text>
+                </View>
+                <Entypo name="chevron-small-right" size={20} color="black" />
+            </TouchableOpacity>
+            <TouchableOpacity
+                activeOpacity={0.5}
+                style={[
+                    {
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        borderRadius: 6,
+                        height: 72,
+                        paddingHorizontal: 10,
+                        marginBottom: 10,
+                        backgroundColor: '#fff',
+                        shadowColor: '#000',
+                        shadowOffset: { width: 0, height: 3 },
+                        shadowOpacity: 0.5,
+                        shadowRadius: 6,
+                        elevation: 1
+                    }
+                ]}
+            >
+                <Ionicons
+                    name="location"
+                    size={24}
+                    color="#DD4335"
+                    style={styles.icon}
+                />
+                <View style={{ flex: 1, marginLeft: 10 }}>
+                    <Text style={{ color: '#ccc' }}>Current Location</Text>
+                    <Text>3, Gaysi Street, Accra, West Accra, Ghana...</Text>
+                </View>
+                <MaterialIcons name="check" size={20} color="green" />
+            </TouchableOpacity>
+        </View>
+    );
 
     const toggleOverlay = () => {
         setVisible(!visible);
@@ -21,73 +159,97 @@ const Dashboard = ({navigation}:any) => {
 
     return (
         <SafeAreaView style={styles.container}>
-            <ScrollView style={{ width: '100%', padding: 25 }}>
-                <View>
-                    <View style={styles.dashboard}>
-                        <View style={styles.topBar}>
-                            <Ionicons name="grid" size={24} color="#DB4C4C" />
-                            <Ionicons
-                                name="md-notifications"
-                                size={24}
-                                color="#4F4F4F"
-                            />
-                        </View>
-
-                        <Text h4>Good morning [[user]]</Text>
-                        <Text style={styles.subText}>
-                            Where would you like us to pick your waste from
-                        </Text>
-
-                        <View style={styles.field}>
-                            <Ionicons
-                                name="location"
-                                size={20}
-                                color="#DD4335"
-                                style={styles.icon}
-                            />
-                            <TextInput
-                                style={{ paddingLeft: 8 }}
-                                placeholder="Pickup at"
-                            />
-                        </View>
-
-                        <Text style={styles.subTitle}>Recent Requests</Text>
-                    </View>
-                    <View style={styles.requestList}>
-                        <NoRequest />
-
-                        <RequestList />
-                    </View>
-
-                    <Overlay
-                        isVisible={visible}
-                        onBackdropPress={toggleOverlay}
-                        style={styles.overlay}
-                    >
-                        <View style={styles.welcome}>
-                            <View style={styles.imageBg}>
-                                <PopupImage />
+            <BottomSheet
+                ref={sheetRef}
+                snapPoints={[320, 300, 0]}
+                borderRadius={25}
+                renderContent={renderContent}
+                renderHeader={renderHeader}
+                enabledBottomClamp={true}
+                enabledBottomInitialAnimation={true}
+                initialSnap={1}
+                enabledInnerScrolling={false}
+            />
+            <TouchableWithoutFeedback
+                onPress={() => {
+                    console.log('pressed');
+                    sheetRef.current.snapTo(1);
+                }}
+            >
+                <ScrollView style={{ width: '100%', padding: 25 }}>
+                    <View>
+                        <View style={styles.dashboard}>
+                            <View style={styles.topBar}>
+                                <Ionicons
+                                    name="grid"
+                                    size={24}
+                                    color="#DB4C4C"
+                                />
+                                <Ionicons
+                                    name="md-notifications"
+                                    size={24}
+                                    color="#4F4F4F"
+                                />
                             </View>
 
-                            <Text style={styles.welcomeTitle}>
-                                Welcome to Waste Collection
+                            <Text h4>Good morning [[user]]</Text>
+                            <Text style={styles.subText}>
+                                Where would you like us to pick your waste from
                             </Text>
-                            <Text style={styles.welcomeText}>
-                                What we do here is we help to organize a
-                                reliable waste collection service and we hope
-                                you enjoy our service
-                            </Text>
-                            <Button
-                                title="Got it"
-                                buttonStyle={{
-                                    backgroundColor: '#9A0707'
-                                }}
-                                onPress={toggleOverlay}
-                            />
+
+                            <TouchableOpacity
+                                style={styles.field}
+                                onPress={() => sheetRef.current.snapTo(0)}
+                            >
+                                <Ionicons
+                                    name="location"
+                                    size={20}
+                                    color="#DD4335"
+                                    style={styles.icon}
+                                />
+                                <Text style={{ paddingLeft: 8 }}>
+                                    Pickup at
+                                </Text>
+                            </TouchableOpacity>
+
+                            <Text style={styles.subTitle}>Recent Requests</Text>
                         </View>
-                    </Overlay>
-                </View>
-            </ScrollView>
+                        <View style={styles.requestList}>
+                            <NoRequest />
+
+                            <RequestList />
+                        </View>
+
+                        <Overlay
+                            isVisible={visible}
+                            onBackdropPress={toggleOverlay}
+                            style={styles.overlay}
+                        >
+                            <View style={styles.welcome}>
+                                <View style={styles.imageBg}>
+                                    <PopupImage />
+                                </View>
+
+                                <Text style={styles.welcomeTitle}>
+                                    Welcome to Waste Collection
+                                </Text>
+                                <Text style={styles.welcomeText}>
+                                    What we do here is we help to organize a
+                                    reliable waste collection service and we
+                                    hope you enjoy our service
+                                </Text>
+                                <Button
+                                    title="Got it"
+                                    buttonStyle={{
+                                        backgroundColor: '#9A0707'
+                                    }}
+                                    onPress={toggleOverlay}
+                                />
+                            </View>
+                        </Overlay>
+                    </View>
+                </ScrollView>
+            </TouchableWithoutFeedback>
             <View>
                 <Button
                     title="Request a Pickup"
@@ -103,7 +265,7 @@ const Dashboard = ({navigation}:any) => {
                     titleStyle={{
                         fontSize: 14
                     }}
-                    onPress={() => navigation.navigate("Pickup")}
+                    onPress={() => navigation.navigate('Pickup')}
                 />
             </View>
         </SafeAreaView>
@@ -172,6 +334,11 @@ const styles = StyleSheet.create({
         backgroundColor: '#F6EBE4',
         padding: 4,
         borderRadius: 4
+        // width: 32,
+        // height: 32,
+        // display: 'flex',
+        // justifyContent: 'center',
+        // alignItems: 'center'
     },
     subTitle: {
         fontSize: 16,

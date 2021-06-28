@@ -11,38 +11,45 @@ import {
 import { Text, Button } from 'react-native-elements';
 import { Ionicons } from '@expo/vector-icons';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import dayjs from 'dayjs';
+
+const showDate = (date: any) => {
+    if (!date) return undefined;
+    return dayjs(date).format('DD/MM/YYYY');
+};
+
+const showTime = (date: any) => {
+    if (!date) return undefined;
+    return dayjs(date).format('HH:mm A');
+};
 
 const PickTime = ({ navigation }: any) => {
+    const toDay = new Date();
+    const [{ showDatePiker, pickup }, setDate] = useState<{
+        showDatePiker: boolean;
+        pickup: Date | undefined;
+    }>({ showDatePiker: false, pickup: undefined });
+    const [{ showTimePiker, time }, setTime] = useState<{
+        showTimePiker: boolean;
+        time: Date | undefined;
+    }>({ showTimePiker: false, time: undefined });
 
-    const [date, setDate] = useState(new Date());
-    const [pickup, setPickup] = useState("Pickup at");
-    const [time, setTime] = useState("Pickup at");
-    const [mode, setMode] = useState('date');
-    const [show, setShow] = useState(false);
-
-    console.log({date});
-    
-    const onChange = (event, selectedDate) => {
-        const currentDate = selectedDate || date;
-        setShow(Platform.OS === 'ios');
-        setDate(currentDate);
-        setPickup(date.toString().slice(4,15))
-        setTime(date.toString().slice(16,24))
+    const onChangeDate = (event: any, selectedDate: any) => {
+        const currentDate = selectedDate || toDay;
+        setDate({ showDatePiker: false, pickup: currentDate });
     };
 
-    const showMode = (currentMode) => {
-        setShow(true);
-        setMode(currentMode);
+    const onChangeTime = (event: any, selectedDate: any) => {
+        const currentDate = selectedDate || toDay;
+        setTime({ showTimePiker: false, time: currentDate });
     };
 
     const showDatepicker = () => {
-        console.log("here");
-
-        showMode('date');
+        setDate((prev) => ({ ...prev, showDatePiker: true }));
     };
 
     const showTimepicker = () => {
-        showMode('time');
+        setTime((prev) => ({ ...prev, showTimePiker: true }));
     };
 
     return (
@@ -59,30 +66,47 @@ const PickTime = ({ navigation }: any) => {
                     <Text style={styles.subText}>Request a Pickup</Text>
                     <Text style={styles.title}>Enter date & time</Text>
 
-                    <TouchableOpacity style={styles.field} onPress={showDatepicker}>
+                    <TouchableOpacity
+                        style={styles.field}
+                        onPress={showDatepicker}
+                    >
                         <Ionicons
                             name="md-calendar"
                             size={20}
                             color="#DD4335"
                         />
 
-                        <Text style={{ paddingLeft: 8 }}>{pickup}</Text>
+                        <Text style={{ paddingLeft: 8 }}>
+                            {showDate(pickup) || 'Pickup at'}
+                        </Text>
                     </TouchableOpacity>
 
-                    <TouchableOpacity style={styles.field} onPress={showTimepicker}>
+                    <TouchableOpacity
+                        style={styles.field}
+                        onPress={showTimepicker}
+                    >
                         <Ionicons name="md-time" size={24} color="#DD4335" />
-                        <Text style={{ paddingLeft: 8 }}>{time}</Text>
+                        <Text style={{ paddingLeft: 8 }}>
+                            {showTime(time) || 'Pickup at'}
+                        </Text>
                     </TouchableOpacity>
                 </View>
-                {show && (
+                {showDatePiker && (
                     <DateTimePicker
-                        testID="dateTimePicker"
-                        value={date}
-                        mode={mode}
+                        value={pickup || toDay}
+                        mode="date"
+                        display="default"
+                        onChange={onChangeDate}
+                        minimumDate={toDay}
+                    />
+                )}
+                {showTimePiker && (
+                    <DateTimePicker
+                        value={time || toDay}
+                        mode="time"
                         is24Hour={true}
                         display="default"
-                        minimumDate={new Date()}
-                        onChange={onChange}
+                        onChange={onChangeTime}
                     />
                 )}
             </ScrollView>
@@ -101,7 +125,7 @@ const PickTime = ({ navigation }: any) => {
                     titleStyle={{
                         fontSize: 14
                     }}
-                    onPress={() => navigation.navigate("WasteCollection")}
+                    onPress={() => navigation.navigate('WasteCollection')}
                 />
             </View>
         </SafeAreaView>
