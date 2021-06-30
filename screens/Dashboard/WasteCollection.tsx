@@ -100,13 +100,13 @@ const WasteCollection = ({navigation}:any) => {
                 }}
             >
                 <View style={styles.dashboard}>
-                    <View style={styles.topBar}>
+                <TouchableOpacity style={styles.topBar} onPress={()=>navigation.goBack()}>
                         <Ionicons
                             name="chevron-back"
                             size={24}
                             color="#200E32"
                         />
-                    </View>
+                    </TouchableOpacity>
                     <Text style={styles.subText}>Request a Pickup</Text>
                     <Text style={styles.title}>
                         Select and enter the number of bins

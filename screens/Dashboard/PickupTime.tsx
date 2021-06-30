@@ -56,13 +56,13 @@ const PickTime = ({ navigation }: any) => {
         <SafeAreaView style={styles.container}>
             <ScrollView style={{ width: '100%', padding: 25 }}>
                 <View style={styles.dashboard}>
-                    <View style={styles.topBar}>
+                    <TouchableOpacity style={styles.topBar} onPress={()=>navigation.goBack()}>
                         <Ionicons
                             name="chevron-back"
                             size={24}
                             color="#200E32"
                         />
-                    </View>
+                    </TouchableOpacity>
                     <Text style={styles.subText}>Request a Pickup</Text>
                     <Text style={styles.title}>Enter date & time</Text>
 

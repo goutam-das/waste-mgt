@@ -9,6 +9,9 @@ import MainPage from './Main';
 import PickupTime from './PickupTime';
 import WasteCollection from './WasteCollection';
 import Review from './Review';
+import Location from "./location";
+import AddressBook from './Address/AddressBook';
+import EditAddress from './Address/EditAddress';
 
 type Props = StackScreenProps<RootStackParamList, 'Signup'>;
 const Stack = createStackNavigator();
@@ -28,7 +31,7 @@ export default class Signup extends React.Component<Props> {
         });
     };
 
-    componentDidMount() {}
+    componentDidMount() { }
 
     render() {
         const { initialRoute } = this.state;
@@ -50,6 +53,7 @@ export default class Signup extends React.Component<Props> {
                     <Stack.Screen
                         name="Main"
                         component={MainPage}
+                        // component={Location}
                         initialParams={{
                             updateState: this.updateState,
                             getState: this.getState
@@ -79,6 +83,23 @@ export default class Signup extends React.Component<Props> {
                             getState: this.getState
                         }}
                     ></Stack.Screen>
+                    <Stack.Screen
+                        name="AddressBook"
+                        component={AddressBook}
+                        initialParams={{
+                            updateState: this.updateState,
+                            getState: this.getState
+                        }}
+                    ></Stack.Screen>
+                    <Stack.Screen
+                        name="EditAddress"
+                        component={EditAddress}
+                        initialParams={{
+                            updateState: this.updateState,
+                            getState: this.getState
+                        }}
+                    ></Stack.Screen>
+
                 </Stack.Navigator>
             </>
         );

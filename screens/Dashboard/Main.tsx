@@ -78,6 +78,7 @@ const Dashboard = ({ navigation }: any) => {
                         elevation: 1
                     }
                 ]}
+                onPress={() => navigation.navigate('EditAddress')}
             >
                 <AntDesign
                     name="edit"
@@ -86,7 +87,7 @@ const Dashboard = ({ navigation }: any) => {
                     style={styles.icon}
                 />
                 <View style={{ flex: 1, marginLeft: 10 }}>
-                    <Text>Email Address</Text>
+                    <Text>Edit Address</Text>
                 </View>
                 <Entypo name="chevron-small-right" size={20} color="black" />
             </TouchableOpacity>
@@ -107,6 +108,7 @@ const Dashboard = ({ navigation }: any) => {
                         elevation: 1
                     }
                 ]}
+                onPress={() => navigation.navigate('AddressBook')}
             >
                 <Foundation
                     name="address-book"
