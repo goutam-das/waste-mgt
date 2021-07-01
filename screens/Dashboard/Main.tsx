@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
     View,
     SafeAreaView,
@@ -8,6 +8,7 @@ import {
     TouchableOpacity,
     TouchableWithoutFeedback
 } from 'react-native';
+import * as Location from 'expo-location';
 import { Text, Button, Overlay } from 'react-native-elements';
 import BottomSheet from 'reanimated-bottom-sheet';
 import { Entypo } from '@expo/vector-icons';
@@ -17,10 +18,53 @@ import { MaterialIcons } from '@expo/vector-icons';
 import { Ionicons, AntDesign, Foundation } from '@expo/vector-icons';
 import RequestList from '../components/RequestList';
 import NoRequest from '../components/NoRequest';
+import axios from 'axios';
 
-const Dashboard = ({ navigation }: any) => {
+const Key = 'rruGYPG2GH8coVTot3dAgw2Wyy2fc1tF';
+
+const Dashboard = ({ navigation, route }: any) => {
     const sheetRef: any = React.useRef(null);
+    const [{ location, type }, setState] = useState<{
+        location: string;
+        type: 'Edit Address' | 'Address Book' | 'Current Location' | undefined;
+    }>({
+        location: '',
+        type: undefined
+    });
+    const [currentLocation, setCurrentLocation] = useState<string>('');
     const [visible, setVisible] = useState(true);
+
+    useEffect(() => {
+        if (route.params?.type === 'Edit Address') {
+            setState({ location: route.params.location, type: 'Edit Address' });
+        }
+        if (route.params?.type === 'Address Book') {
+            setState({ location: route.params.location, type: 'Address Book' });
+        }
+    }, [route.params]);
+
+    useEffect(() => {
+        (async () => {
+            try {
+                let { status } =
+                    await Location.requestForegroundPermissionsAsync();
+                if (status !== 'granted') return;
+                const location = await Location.getCurrentPositionAsync({});
+                if (!Boolean(location.coords)) return;
+                const { data } = await axios.get(
+                    `http://open.mapquestapi.com/geocoding/v1/reverse?key=${Key}&location=${location.coords.latitude},${location.coords.longitude}`
+                );
+                if (data) {
+                    const location = data?.results[0]?.locations[0];
+                    setCurrentLocation(
+                        `${location.street},${location.adminArea5},${location.adminArea3},${location.adminArea1}`
+                    );
+                }
+            } catch (error) {
+                console.error(error);
+            }
+        })();
+    }, []);
 
     const renderHeader = () => (
         <View
@@ -89,7 +133,15 @@ const Dashboard = ({ navigation }: any) => {
                 <View style={{ flex: 1, marginLeft: 10 }}>
                     <Text>Edit Address</Text>
                 </View>
-                <Entypo name="chevron-small-right" size={20} color="black" />
+                {type === 'Edit Address' ? (
+                    <MaterialIcons name="check" size={20} color="green" />
+                ) : (
+                    <Entypo
+                        name="chevron-small-right"
+                        size={20}
+                        color="black"
+                    />
+                )}
             </TouchableOpacity>
             <TouchableOpacity
                 style={[
@@ -119,9 +171,23 @@ const Dashboard = ({ navigation }: any) => {
                 <View style={{ flex: 1, marginLeft: 10 }}>
                     <Text>Choose from address book</Text>
                 </View>
-                <Entypo name="chevron-small-right" size={20} color="black" />
+                {type === 'Address Book' ? (
+                    <MaterialIcons name="check" size={20} color="green" />
+                ) : (
+                    <Entypo
+                        name="chevron-small-right"
+                        size={20}
+                        color="black"
+                    />
+                )}
             </TouchableOpacity>
             <TouchableOpacity
+                onPress={() =>
+                    setState({
+                        location: currentLocation,
+                        type: 'Current Location'
+                    })
+                }
                 activeOpacity={0.5}
                 style={[
                     {
@@ -148,9 +214,17 @@ const Dashboard = ({ navigation }: any) => {
                 />
                 <View style={{ flex: 1, marginLeft: 10 }}>
                     <Text style={{ color: '#ccc' }}>Current Location</Text>
-                    <Text>3, Gaysi Street, Accra, West Accra, Ghana...</Text>
+                    <Text>{currentLocation}</Text>
                 </View>
-                <MaterialIcons name="check" size={20} color="green" />
+                {type === 'Current Location' ? (
+                    <MaterialIcons name="check" size={20} color="green" />
+                ) : (
+                    <Entypo
+                        name="chevron-small-right"
+                        size={20}
+                        color="black"
+                    />
+                )}
             </TouchableOpacity>
         </View>
     );
@@ -210,7 +284,7 @@ const Dashboard = ({ navigation }: any) => {
                                     style={styles.icon}
                                 />
                                 <Text style={{ paddingLeft: 8 }}>
-                                    Pickup at
+                                    {location || 'Pickup at'}
                                 </Text>
                             </TouchableOpacity>
 

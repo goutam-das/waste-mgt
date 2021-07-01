@@ -12,28 +12,41 @@ import {
 import { Text, Icon } from 'react-native-elements';
 import { Ionicons } from '@expo/vector-icons';
 import axios from 'axios';
+import { useCallback } from 'react';
+import { Firestore } from '../../../services/firebase';
 
-const Key = "rruGYPG2GH8coVTot3dAgw2Wyy2fc1tF"; //api key
+const Key = 'rruGYPG2GH8coVTot3dAgw2Wyy2fc1tF'; //api key
 
 const EditAddress: FC = ({ navigation }: any) => {
-
     const [data, setData] = useState<any>([]);
-    const [search, setSearch] = useState('');
 
-    function getSearch() {
-        console.log(search);
-        getaddress(search).then(response => {
-            console.log(response?.data?.results[0].locations);
-            setData(response?.data?.results[0].locations);
-
-        });
-    }
+    const onSearch = useCallback((search) => {
+        axios
+            .get(
+                `http://www.mapquestapi.com/geocoding/v1/address?key=${Key}&location=${search}`
+            )
+            .then(({ data }) => {
+                setData(data?.results[0].locations);
+            });
+    }, []);
 
     const renderAddress = ({ item }: any) => {
+        const location = `${item.street},${item.adminArea5},${item.adminArea3},${item.adminArea1}`;
         return (
             <TouchableOpacity
                 style={styles.field}
-                onPress={() => alert("press")}
+                onPress={() => {
+                    Firestore.collection('address_book')
+                        .add({ location })
+                        .then((res) => {
+                            console.log(res);
+                        })
+                        .catch((error) => console.error(error));
+                    navigation.navigate('Main', {
+                        location,
+                        type: 'Edit Address'
+                    });
+                }}
             >
                 <Ionicons
                     name="location"
@@ -41,24 +54,36 @@ const EditAddress: FC = ({ navigation }: any) => {
                     color="#DD4335"
                     style={styles.icon}
                 />
-                <View style={{ justifyContent: "center" }}>
+                <View style={{ justifyContent: 'center' }}>
                     <Text style={{ paddingLeft: 8, fontSize: 15 }}>
-                        Dubai Mall
+                        {item.street}
                     </Text>
-                    <Text style={{ paddingLeft: 8, paddingTop: 2, fontSize: 12, width: "95%" }} numberOfLines={1} ellipsizeMode={"tail"}>
-                    Financial Center Street, Along Sheikh Zayed Road,Dubai - UAE
+                    <Text
+                        style={{
+                            paddingLeft: 8,
+                            paddingTop: 2,
+                            fontSize: 12,
+                            width: '95%'
+                        }}
+                        numberOfLines={1}
+                        ellipsizeMode={'tail'}
+                    >
+                        `${item.adminArea5},${item.adminArea3},$
+                        {item.adminArea1}`;
                     </Text>
                 </View>
-
             </TouchableOpacity>
-        )
-    }
+        );
+    };
 
     return (
         <SafeAreaView style={styles.container}>
             <View style={{ width: '100%', padding: 25 }}>
                 <View style={styles.dashboard}>
-                    <TouchableOpacity style={styles.topBar} onPress={() => navigation.goBack()}>
+                    <TouchableOpacity
+                        style={styles.topBar}
+                        onPress={() => navigation.goBack()}
+                    >
                         <Ionicons
                             name="chevron-back"
                             size={24}
@@ -72,32 +97,30 @@ const EditAddress: FC = ({ navigation }: any) => {
                         name="search"
                         type="evilicon"
                         color="#000"
-                        onPress={() => getSearch()}
                         size={30}
                         style={styles.icon}
                     />
                     <TextInput
                         placeholder="Search Location"
-                        onChangeText={search => setSearch(search)}
+                        onChangeText={onSearch}
                         style={{
                             fontSize: 16,
                             padding: 12,
-                            flexGrow: 1,
+                            flexGrow: 1
                         }}
                     />
-
                 </View>
-                <FlatList
-                    data={data}
-                    renderItem={renderAddress}
-                    keyExtractor={item => item.id}
-                />
+                <View style={{ height: '80%' }}>
+                    <FlatList
+                        data={data}
+                        renderItem={renderAddress}
+                        keyExtractor={(item) => item.id}
+                    />
+                </View>
             </View>
-
         </SafeAreaView>
-
-    )
-}
+    );
+};
 
 export default EditAddress;
 
@@ -109,14 +132,13 @@ const styles = StyleSheet.create({
     },
     dashboard: {
         marginTop: '7%',
-        flexDirection: "row",
-        alignItems: "center",
-        marginBottom: "5%"
-
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: '5%'
     },
     topBar: {
         flexDirection: 'row',
-        justifyContent: 'space-between',
+        justifyContent: 'space-between'
         //marginBottom: '5%',
         //marginTop: '8%'
     },
@@ -124,7 +146,7 @@ const styles = StyleSheet.create({
         color: '#010101',
         fontSize: 16,
         padding: 10,
-        fontWeight: "bold"
+        fontWeight: 'bold'
     },
 
     icon: {
@@ -141,15 +163,5 @@ const styles = StyleSheet.create({
         marginBottom: 7,
         backgroundColor: '#fff',
         marginTop: 7
-    },
-   
-
-})
-
-
-export function getaddress(search: string) {
-    console.log('calling get api.....');
-    return axios.get(`http://www.mapquestapi.com/geocoding/v1/address?key=${Key}&location=${search}`, {
-        headers: {},
-    });
-}
+    }
+});

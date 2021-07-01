@@ -53,7 +53,6 @@ export default class Signup extends React.Component<Props> {
                     <Stack.Screen
                         name="Main"
                         component={MainPage}
-                        // component={Location}
                         initialParams={{
                             updateState: this.updateState,
                             getState: this.getState
@@ -86,20 +85,11 @@ export default class Signup extends React.Component<Props> {
                     <Stack.Screen
                         name="AddressBook"
                         component={AddressBook}
-                        initialParams={{
-                            updateState: this.updateState,
-                            getState: this.getState
-                        }}
                     ></Stack.Screen>
                     <Stack.Screen
                         name="EditAddress"
                         component={EditAddress}
-                        initialParams={{
-                            updateState: this.updateState,
-                            getState: this.getState
-                        }}
                     ></Stack.Screen>
-
                 </Stack.Navigator>
             </>
         );
