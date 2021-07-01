@@ -31,6 +31,8 @@ const EditAddress: FC = ({ navigation }: any) => {
     }, []);
 
     const renderAddress = ({ item }: any) => {
+        console.log({item});
+        
         const location = `${item.street},${item.adminArea5},${item.adminArea3},${item.adminArea1}`;
         return (
             <TouchableOpacity
@@ -63,13 +65,12 @@ const EditAddress: FC = ({ navigation }: any) => {
                             paddingLeft: 8,
                             paddingTop: 2,
                             fontSize: 12,
-                            width: '95%'
+                            //width: '95%'
                         }}
                         numberOfLines={1}
                         ellipsizeMode={'tail'}
                     >
-                        `${item.adminArea5},${item.adminArea3},$
-                        {item.adminArea1}`;
+                        {`${item.adminArea5},${item.adminArea3},${item.adminArea1}`}
                     </Text>
                 </View>
             </TouchableOpacity>
