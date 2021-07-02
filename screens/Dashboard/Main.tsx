@@ -1,29 +1,28 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
     View,
     SafeAreaView,
     StyleSheet,
     ScrollView,
-    TextInput,
     TouchableOpacity,
     TouchableWithoutFeedback
 } from 'react-native';
 import * as Location from 'expo-location';
 import { Text, Button, Overlay } from 'react-native-elements';
-import BottomSheet from 'reanimated-bottom-sheet';
 import { Entypo } from '@expo/vector-icons';
-import Animated from 'react-native-reanimated';
 import PopupImage from '../../svg/Popup';
 import { MaterialIcons } from '@expo/vector-icons';
 import { Ionicons, AntDesign, Foundation } from '@expo/vector-icons';
 import RequestList from '../components/RequestList';
 import NoRequest from '../components/NoRequest';
 import axios from 'axios';
+import RBSheet from 'react-native-raw-bottom-sheet';
 
 const Key = 'rruGYPG2GH8coVTot3dAgw2Wyy2fc1tF';
 
 const Dashboard = ({ navigation, route }: any) => {
     const sheetRef: any = React.useRef(null);
+    const refRBSheet: any = useRef(null);
     const [{ location, type }, setState] = useState<{
         location: string;
         type: 'Edit Address' | 'Address Book' | 'Current Location' | undefined;
@@ -66,186 +65,12 @@ const Dashboard = ({ navigation, route }: any) => {
         })();
     }, []);
 
-    const renderHeader = () => (
-        <View
-            style={[
-                {
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    height: 50,
-                    backgroundColor: '#fff',
-                    justifyContent: 'center',
-                    paddingVertical: 10,
-                    shadowColor: '#000',
-                    shadowOffset: { width: 0, height: 3 },
-                    shadowOpacity: 0.5,
-                    shadowRadius: 5,
-                    elevation: 1,
-                    borderTopLeftRadius: 25,
-                    borderTopRightRadius: 25
-                }
-            ]}
-        >
-            <Text style={{ fontSize: 16 }}>Delivery Address</Text>
-        </View>
-    );
-    const renderContent = () => (
-        <View
-            style={{
-                backgroundColor: '#fff',
-                padding: 16,
-                // height: 450,
-                borderBottomLeftRadius: 10,
-                borderBottomRightRadius: 10,
-                shadowColor: '#000000',
-                shadowOffset: { width: 0, height: 2 },
-                shadowOpacity: 0.9,
-                shadowRadius: 3,
-                elevation: 3
-            }}
-        >
-            <TouchableOpacity
-                activeOpacity={0.5}
-                style={[
-                    {
-                        flexDirection: 'row',
-                        alignItems: 'center',
-                        borderRadius: 6,
-                        height: 72,
-                        paddingHorizontal: 10,
-                        marginBottom: 10,
-                        backgroundColor: '#fff',
-                        shadowColor: '#000',
-                        shadowOffset: { width: 0, height: 3 },
-                        shadowOpacity: 0.5,
-                        shadowRadius: 6,
-                        elevation: 1
-                    }
-                ]}
-                onPress={() => navigation.navigate('EditAddress')}
-            >
-                <AntDesign
-                    name="edit"
-                    size={24}
-                    color="#DD4335"
-                    style={styles.icon}
-                />
-                <View style={{ flex: 1, marginLeft: 10 }}>
-                    <Text>Edit Address</Text>
-                </View>
-                {type === 'Edit Address' ? (
-                    <MaterialIcons name="check" size={20} color="green" />
-                ) : (
-                    <Entypo
-                        name="chevron-small-right"
-                        size={20}
-                        color="black"
-                    />
-                )}
-            </TouchableOpacity>
-            <TouchableOpacity
-                style={[
-                    {
-                        flexDirection: 'row',
-                        alignItems: 'center',
-                        borderRadius: 6,
-                        height: 72,
-                        paddingHorizontal: 10,
-                        marginBottom: 10,
-                        backgroundColor: '#fff',
-                        shadowColor: '#000',
-                        shadowOffset: { width: 0, height: 3 },
-                        shadowOpacity: 0.5,
-                        shadowRadius: 6,
-                        elevation: 1
-                    }
-                ]}
-                onPress={() => navigation.navigate('AddressBook')}
-            >
-                <Foundation
-                    name="address-book"
-                    size={24}
-                    color="#DD4335"
-                    style={styles.icon}
-                />
-                <View style={{ flex: 1, marginLeft: 10 }}>
-                    <Text>Choose from address book</Text>
-                </View>
-                {type === 'Address Book' ? (
-                    <MaterialIcons name="check" size={20} color="green" />
-                ) : (
-                    <Entypo
-                        name="chevron-small-right"
-                        size={20}
-                        color="black"
-                    />
-                )}
-            </TouchableOpacity>
-            <TouchableOpacity
-                onPress={() =>
-                    setState({
-                        location: currentLocation,
-                        type: 'Current Location'
-                    })
-                }
-                activeOpacity={0.5}
-                style={[
-                    {
-                        flexDirection: 'row',
-                        alignItems: 'center',
-                        borderRadius: 6,
-                        height: 72,
-                        paddingHorizontal: 10,
-                        marginBottom: 10,
-                        backgroundColor: '#fff',
-                        shadowColor: '#000',
-                        shadowOffset: { width: 0, height: 3 },
-                        shadowOpacity: 0.5,
-                        shadowRadius: 6,
-                        elevation: 1
-                    }
-                ]}
-            >
-                <Ionicons
-                    name="location"
-                    size={24}
-                    color="#DD4335"
-                    style={styles.icon}
-                />
-                <View style={{ flex: 1, marginLeft: 10 }}>
-                    <Text style={{ color: '#ccc' }}>Current Location</Text>
-                    <Text>{currentLocation}</Text>
-                </View>
-                {type === 'Current Location' ? (
-                    <MaterialIcons name="check" size={20} color="green" />
-                ) : (
-                    <Entypo
-                        name="chevron-small-right"
-                        size={20}
-                        color="black"
-                    />
-                )}
-            </TouchableOpacity>
-        </View>
-    );
-
     const toggleOverlay = () => {
         setVisible(!visible);
     };
 
     return (
         <SafeAreaView style={styles.container}>
-            <BottomSheet
-                ref={sheetRef}
-                snapPoints={[320, 300, 0]}
-                borderRadius={25}
-                renderContent={renderContent}
-                renderHeader={renderHeader}
-                enabledBottomClamp={true}
-                enabledBottomInitialAnimation={true}
-                initialSnap={1}
-                enabledInnerScrolling={false}
-            />
             <TouchableWithoutFeedback
                 onPress={() => {
                     console.log('pressed');
@@ -275,7 +100,7 @@ const Dashboard = ({ navigation, route }: any) => {
 
                             <TouchableOpacity
                                 style={styles.field}
-                                onPress={() => sheetRef.current.snapTo(0)}
+                                onPress={() => refRBSheet.current.open()}
                             >
                                 <Ionicons
                                     name="location"
@@ -344,6 +169,199 @@ const Dashboard = ({ navigation, route }: any) => {
                     onPress={() => navigation.navigate('Pickup')}
                 />
             </View>
+            <RBSheet
+                ref={refRBSheet}
+                closeOnDragDown={true}
+                closeOnPressMask={true}
+                dragFromTopOnly={true}
+                height={350}
+                customStyles={{
+                    wrapper: {
+                        backgroundColor: 'rgba(0,0,0,0.25)'
+                    },
+                    draggableIcon: {
+                        backgroundColor: 'rgba(0,0,0,0.45)'
+                    },
+                    container: {
+                        elevation: 100,
+                        borderTopLeftRadius: 20,
+                        borderTopRightRadius: 20
+                    }
+                }}
+            >
+                <View
+                    style={[
+                        {
+                            flexDirection: 'row',
+                            alignItems: 'center',
+                            height: 50,
+                            backgroundColor: '#fff',
+                            justifyContent: 'center',
+                            paddingVertical: 10,
+                            shadowColor: '#000',
+                            shadowOffset: { width: 0, height: 3 },
+                            shadowOpacity: 0.5,
+                            shadowRadius: 5,
+                            elevation: 1,
+                            borderTopLeftRadius: 25,
+                            borderTopRightRadius: 25
+                        }
+                    ]}
+                >
+                    <Text style={{ fontSize: 16 }}>Delivery Address</Text>
+                </View>
+                <View
+                    style={{
+                        backgroundColor: '#fff',
+                        padding: 16,
+                        // height: 450,
+                        borderBottomLeftRadius: 10,
+                        borderBottomRightRadius: 10,
+                        shadowColor: '#000000',
+                        shadowOffset: { width: 0, height: 2 },
+                        shadowOpacity: 0.9,
+                        shadowRadius: 3,
+                        elevation: 3
+                    }}
+                >
+                    <TouchableOpacity
+                        activeOpacity={0.5}
+                        style={[
+                            {
+                                flexDirection: 'row',
+                                alignItems: 'center',
+                                borderRadius: 6,
+                                height: 72,
+                                paddingHorizontal: 10,
+                                marginBottom: 10,
+                                backgroundColor: '#fff',
+                                shadowColor: '#000',
+                                shadowOffset: { width: 0, height: 3 },
+                                shadowOpacity: 0.5,
+                                shadowRadius: 6,
+                                elevation: 1
+                            }
+                        ]}
+                        onPress={() => navigation.navigate('EditAddress')}
+                    >
+                        <AntDesign
+                            name="edit"
+                            size={24}
+                            color="#DD4335"
+                            style={styles.icon}
+                        />
+                        <View style={{ flex: 1, marginLeft: 10 }}>
+                            <Text>Edit Address</Text>
+                        </View>
+                        {type === 'Edit Address' ? (
+                            <MaterialIcons
+                                name="check"
+                                size={20}
+                                color="green"
+                            />
+                        ) : (
+                            <Entypo
+                                name="chevron-small-right"
+                                size={20}
+                                color="black"
+                            />
+                        )}
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                        style={[
+                            {
+                                flexDirection: 'row',
+                                alignItems: 'center',
+                                borderRadius: 6,
+                                height: 72,
+                                paddingHorizontal: 10,
+                                marginBottom: 10,
+                                backgroundColor: '#fff',
+                                shadowColor: '#000',
+                                shadowOffset: { width: 0, height: 3 },
+                                shadowOpacity: 0.5,
+                                shadowRadius: 6,
+                                elevation: 1
+                            }
+                        ]}
+                        onPress={() => navigation.navigate('AddressBook')}
+                    >
+                        <Foundation
+                            name="address-book"
+                            size={24}
+                            color="#DD4335"
+                            style={styles.icon}
+                        />
+                        <View style={{ flex: 1, marginLeft: 10 }}>
+                            <Text>Choose from address book</Text>
+                        </View>
+                        {type === 'Address Book' ? (
+                            <MaterialIcons
+                                name="check"
+                                size={20}
+                                color="green"
+                            />
+                        ) : (
+                            <Entypo
+                                name="chevron-small-right"
+                                size={20}
+                                color="black"
+                            />
+                        )}
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                        onPress={() =>
+                            setState({
+                                location: currentLocation,
+                                type: 'Current Location'
+                            })
+                        }
+                        activeOpacity={0.5}
+                        style={[
+                            {
+                                flexDirection: 'row',
+                                alignItems: 'center',
+                                borderRadius: 6,
+                                height: 72,
+                                paddingHorizontal: 10,
+                                marginBottom: 10,
+                                backgroundColor: '#fff',
+                                shadowColor: '#000',
+                                shadowOffset: { width: 0, height: 3 },
+                                shadowOpacity: 0.5,
+                                shadowRadius: 6,
+                                elevation: 1
+                            }
+                        ]}
+                    >
+                        <Ionicons
+                            name="location"
+                            size={24}
+                            color="#DD4335"
+                            style={styles.icon}
+                        />
+                        <View style={{ flex: 1, marginLeft: 10 }}>
+                            <Text style={{ color: '#ccc' }}>
+                                Current Location
+                            </Text>
+                            <Text>{currentLocation}</Text>
+                        </View>
+                        {type === 'Current Location' ? (
+                            <MaterialIcons
+                                name="check"
+                                size={20}
+                                color="green"
+                            />
+                        ) : (
+                            <Entypo
+                                name="chevron-small-right"
+                                size={20}
+                                color="black"
+                            />
+                        )}
+                    </TouchableOpacity>
+                </View>
+            </RBSheet>
         </SafeAreaView>
     );
 };
