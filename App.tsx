@@ -13,7 +13,7 @@ LogBox.ignoreLogs(['Setting a timer']);
 const Stack = createStackNavigator();
 enableScreens();
 export default function App() {
-    const [initialRoute] = useState('Dashboard');
+    const [initialRoute] = useState('Welcome');
     const [fontLoaded] = useFonts({
         ...Ionicons.font
     });

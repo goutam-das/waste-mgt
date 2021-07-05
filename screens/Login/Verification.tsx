@@ -53,7 +53,7 @@ export default class PhoneNumberVerification extends React.Component {
             const user = await firebase.auth().signInWithCredential(credential);
             this.updateState({ user });
             ToastAndroid.show('Phone authentication successful 👍', 2000);
-            this.props.navigation.navigate('Form');
+            this.props.navigation.navigate('Dashboard');
         } catch (err) {
             ToastAndroid.show(err.message, 2000);
         }
