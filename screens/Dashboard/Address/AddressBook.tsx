@@ -3,41 +3,69 @@ import {
     View,
     SafeAreaView,
     StyleSheet,
-    ScrollView,
-    TextInput,
-    Platform,
     TouchableOpacity,
     FlatList
 } from 'react-native';
-import { Text, Button } from 'react-native-elements';
+import { Text } from 'react-native-elements';
 import { Ionicons } from '@expo/vector-icons';
+import { useEffect } from 'react';
+import { Firestore } from '../../../services/firebase';
 
 const DATA = [
     {
-        "House": "House No.981",
-        "Street": "PRIVADA UNIÓN 10",
-        "City": "CIUDAD DE MÉXICO",
-        "State": " CDMEX",
-        "Country": "MÉXICO",
-        "id": "a1"
+        House: 'House No.981',
+        Street: 'PRIVADA UNIÓN 10',
+        City: 'CIUDAD DE MÉXICO',
+        State: ' CDMEX',
+        Country: 'MÉXICO',
+        id: 'a1'
     },
     {
-        "House": "Dubai Mall",
-        "Street": "Financial Center Street",
-        "City": "Next to Burj Khalifa",
-        "State": " Dubai",
-        "Country": "UAE",
-        "id": "a2"
+        House: 'Dubai Mall',
+        Street: 'Financial Center Street',
+        City: 'Next to Burj Khalifa',
+        State: ' Dubai',
+        Country: 'UAE',
+        id: 'a2'
     }
-]
+];
 
 const AddressBook = ({ navigation }: any) => {
-
+    const [locations, setLocations] = useState<
+        Array<{ id: string; location: string }>
+    >([]);
+    useEffect(() => {
+        Firestore.collection('address_book')
+            .get()
+            .then((querySnapshot) => {
+                const locations: Array<{ id: string; location: string }> = [];
+                querySnapshot.forEach((doc) => {
+                    // doc.data() is never undefined for query doc snapshots
+                    console.log(doc.id, ' => ', doc.data());
+                    locations.push({
+                        id: doc.id,
+                        location: doc.data().location
+                    });
+                });
+                setLocations(locations);
+            })
+            .catch((error) => {
+                console.log('Error getting documents: ', error);
+            });
+    }, [setLocations]);
     const renderAddress = ({ item }: any) => {
+        const x = item.location.split(',');
+        const street = x.slice(0,1).join(',');
+        const location = x.slice(1).join(',');
         return (
             <TouchableOpacity
                 style={styles.field}
-                onPress={() => alert("press")}
+                onPress={() => {
+                    navigation.navigate('Main', {
+                        location,
+                        type: 'Address Book'
+                    });
+                }}
             >
                 <Ionicons
                     name="location"
@@ -45,23 +73,34 @@ const AddressBook = ({ navigation }: any) => {
                     color="#DD4335"
                     style={styles.icon}
                 />
-                <View style={{ justifyContent: "center" }}>
+                <View style={{ justifyContent: 'center' }}>
                     <Text style={{ paddingLeft: 8, fontSize: 15 }}>
-                        {item.House}
+                        {street}
                     </Text>
-                    <Text style={{ paddingLeft: 8, paddingTop: 2, fontSize: 12, width: "95%" }} numberOfLines={1} ellipsizeMode={"tail"}>
-                        {item.Street},{item.City},{item.State},{item.Country}
+                    <Text
+                        style={{
+                            paddingLeft: 8,
+                            paddingTop: 2,
+                            fontSize: 12,
+                            width: '95%'
+                        }}
+                        numberOfLines={1}
+                        ellipsizeMode={'tail'}
+                    >
+                        {location}
                     </Text>
                 </View>
-
             </TouchableOpacity>
-        )
-    }
+        );
+    };
     return (
         <SafeAreaView style={styles.container}>
             <View style={{ width: '100%', padding: 25 }}>
                 <View style={styles.dashboard}>
-                    <TouchableOpacity style={styles.topBar} onPress={() => navigation.goBack()}>
+                    <TouchableOpacity
+                        style={styles.topBar}
+                        onPress={() => navigation.goBack()}
+                    >
                         <Ionicons
                             name="chevron-back"
                             size={24}
@@ -71,16 +110,14 @@ const AddressBook = ({ navigation }: any) => {
                     <Text style={styles.subText}>Address Book</Text>
                 </View>
                 <FlatList
-                    data={DATA}
+                    data={locations}
                     renderItem={renderAddress}
-                    keyExtractor={item => item.id}
+                    keyExtractor={(item) => item.id}
                 />
             </View>
-            
         </SafeAreaView>
-
-    )
-}
+    );
+};
 
 export default AddressBook;
 
@@ -92,14 +129,13 @@ const styles = StyleSheet.create({
     },
     dashboard: {
         marginTop: '7%',
-        flexDirection: "row",
-        alignItems: "center",
-        marginBottom: "5%"
-
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: '5%'
     },
     topBar: {
         flexDirection: 'row',
-        justifyContent: 'space-between',
+        justifyContent: 'space-between'
         //marginBottom: '5%',
         //marginTop: '8%'
     },
@@ -107,7 +143,7 @@ const styles = StyleSheet.create({
         color: '#010101',
         fontSize: 16,
         padding: 10,
-        fontWeight: "bold"
+        fontWeight: 'bold'
     },
     icon: {
         backgroundColor: '#F6EBE4',
@@ -123,7 +159,5 @@ const styles = StyleSheet.create({
         marginBottom: 7,
         backgroundColor: '#fff',
         marginTop: 7
-    },
-})
-
-
+    }
+});

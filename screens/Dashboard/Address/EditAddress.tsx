@@ -115,7 +115,7 @@ const EditAddress: FC = ({ navigation }: any) => {
                     <FlatList
                         data={data}
                         renderItem={renderAddress}
-                        keyExtractor={(item) => item.id}
+                        keyExtractor={(item) => item}
                     />
                 </View>
             </View>
