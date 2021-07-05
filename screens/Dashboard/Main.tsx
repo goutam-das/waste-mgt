@@ -18,7 +18,7 @@ import NoRequest from '../components/NoRequest';
 import axios from 'axios';
 import RBSheet from 'react-native-raw-bottom-sheet';
 
-const Key = 'rruGYPG2GH8coVTot3dAgw2Wyy2fc1tF';
+const Key = '06c73d61b2e80bf877f4d9e4c88cca40';  //key
 
 const Dashboard = ({ navigation, route }: any) => {
     const sheetRef: any = React.useRef(null);
@@ -51,12 +51,12 @@ const Dashboard = ({ navigation, route }: any) => {
                 const location = await Location.getCurrentPositionAsync({});
                 if (!Boolean(location.coords)) return;
                 const { data } = await axios.get(
-                    `http://open.mapquestapi.com/geocoding/v1/reverse?key=${Key}&location=${location.coords.latitude},${location.coords.longitude}`
-                );
+                    `http://api.positionstack.com/v1/reverse?access_key=${Key}&query=${location.coords.latitude},${location.coords.longitude}`
+                                    );
                 if (data) {
-                    const location = data?.results[0]?.locations[0];
+                    const location = data?.data[0];
                     setCurrentLocation(
-                        `${location.street},${location.adminArea5},${location.adminArea3},${location.adminArea1}`
+                        `${location.label}`
                     );
                 }
             } catch (error) {

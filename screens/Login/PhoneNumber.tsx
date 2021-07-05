@@ -31,7 +31,7 @@ export default class PhoneNumber extends React.Component<Props> {
     }
 
     state = {
-        phoneNumber: '',
+        phoneNumber: '548705628',
         onChangeText: '',
         isRunning: false
     };

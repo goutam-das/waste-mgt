@@ -15,25 +15,28 @@ import axios from 'axios';
 import { useCallback } from 'react';
 import { Firestore } from '../../../services/firebase';
 
-const Key = 'rruGYPG2GH8coVTot3dAgw2Wyy2fc1tF'; //api key
+const Key = '06c73d61b2e80bf877f4d9e4c88cca40'; //api key
 
 const EditAddress: FC = ({ navigation }: any) => {
     const [data, setData] = useState<any>([]);
 
+
     const onSearch = useCallback((search) => {
         axios
             .get(
-                `http://www.mapquestapi.com/geocoding/v1/address?key=${Key}&location=${search}`
+                `http://api.positionstack.com/v1/forward?access_key=${Key}&query=${search}`
             )
-            .then(({ data }) => {
-                setData(data?.results[0].locations);
+            .then(( {data} ) => {
+                
+                setData(data.data);
+                
             });
     }, []);
 
     const renderAddress = ({ item }: any) => {
         console.log({item});
         
-        const location = `${item.street},${item.adminArea5},${item.adminArea3},${item.adminArea1}`;
+        const location = `${item.label}`;
         return (
             <TouchableOpacity
                 style={styles.field}
@@ -58,7 +61,7 @@ const EditAddress: FC = ({ navigation }: any) => {
                 />
                 <View style={{ justifyContent: 'center' }}>
                     <Text style={{ paddingLeft: 8, fontSize: 15 }}>
-                        {item.street}
+                        {item.name}
                     </Text>
                     <Text
                         style={{
@@ -70,7 +73,7 @@ const EditAddress: FC = ({ navigation }: any) => {
                         numberOfLines={1}
                         ellipsizeMode={'tail'}
                     >
-                        {`${item.adminArea5},${item.adminArea3},${item.adminArea1}`}
+                        {`${item.label}`}
                     </Text>
                 </View>
             </TouchableOpacity>
