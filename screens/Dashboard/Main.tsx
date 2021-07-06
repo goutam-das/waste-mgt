@@ -17,6 +17,8 @@ import RequestList from '../components/RequestList';
 import NoRequest from '../components/NoRequest';
 import axios from 'axios';
 import RBSheet from 'react-native-raw-bottom-sheet';
+import firebase from 'firebase';
+import { Firestore } from '../../services/firebase';
 
 const Key = '06c73d61b2e80bf877f4d9e4c88cca40';  //key
 
@@ -52,12 +54,24 @@ const Dashboard = ({ navigation, route }: any) => {
                 if (!Boolean(location.coords)) return;
                 const { data } = await axios.get(
                     `http://api.positionstack.com/v1/reverse?access_key=${Key}&query=${location.coords.latitude},${location.coords.longitude}`
-                                    );
+                );
                 if (data) {
-                    const location = data?.data[0];
-                    setCurrentLocation(
-                        `${location.label}`
-                    );
+                    const clocation = data?.data[0];
+                    const location = clocation.label
+                    const currentUser = firebase.auth().currentUser;
+                    const userId = currentUser?.uid;
+                    const geolocation = {
+                        latitude: clocation.latitude,
+                        longitude: clocation.longitude
+                    };
+                    Firestore.collection('address_book')
+                        .add({ location, userId, geolocation })
+                        .then((res) => {
+                            console.log(res);
+                        })
+                        .catch((error) => console.error(error));
+
+                    setCurrentLocation(location);
                 }
             } catch (error) {
                 console.error(error);
