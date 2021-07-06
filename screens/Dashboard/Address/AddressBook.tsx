@@ -9,33 +9,18 @@ import {
 import { Text } from 'react-native-elements';
 import { Ionicons } from '@expo/vector-icons';
 import { useEffect } from 'react';
+import firebase from 'firebase';
 import { Firestore } from '../../../services/firebase';
-
-const DATA = [
-    {
-        House: 'House No.981',
-        Street: 'PRIVADA UNIÓN 10',
-        City: 'CIUDAD DE MÉXICO',
-        State: ' CDMEX',
-        Country: 'MÉXICO',
-        id: 'a1'
-    },
-    {
-        House: 'Dubai Mall',
-        Street: 'Financial Center Street',
-        City: 'Next to Burj Khalifa',
-        State: ' Dubai',
-        Country: 'UAE',
-        id: 'a2'
-    }
-];
 
 const AddressBook = ({ navigation }: any) => {
     const [locations, setLocations] = useState<
         Array<{ id: string; location: string }>
     >([]);
     useEffect(() => {
+        const currentUser = firebase.auth().currentUser;
+        const userId = currentUser?.uid;
         Firestore.collection('address_book')
+            .where('userId', '==', userId)
             .get()
             .then((querySnapshot) => {
                 const locations: Array<{ id: string; location: string }> = [];
@@ -54,15 +39,12 @@ const AddressBook = ({ navigation }: any) => {
             });
     }, [setLocations]);
     const renderAddress = ({ item }: any) => {
-        const x = item.location.split(',');
-        const street = x.slice(0,1).join(',');
-        const location = x.slice(1).join(',');
         return (
             <TouchableOpacity
                 style={styles.field}
                 onPress={() => {
                     navigation.navigate('Main', {
-                        location,
+                        location: item.location,
                         type: 'Address Book'
                     });
                 }}
@@ -74,20 +56,15 @@ const AddressBook = ({ navigation }: any) => {
                     style={styles.icon}
                 />
                 <View style={{ justifyContent: 'center' }}>
-                    <Text style={{ paddingLeft: 8, fontSize: 15 }}>
-                        {street}
-                    </Text>
                     <Text
                         style={{
                             paddingLeft: 8,
                             paddingTop: 2,
                             fontSize: 12,
-                            width: '95%'
                         }}
                         numberOfLines={1}
-                        ellipsizeMode={'tail'}
                     >
-                        {location}
+                        {item.location}
                     </Text>
                 </View>
             </TouchableOpacity>

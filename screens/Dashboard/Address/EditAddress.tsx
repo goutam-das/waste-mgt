@@ -13,36 +13,41 @@ import { Text, Icon } from 'react-native-elements';
 import { Ionicons } from '@expo/vector-icons';
 import axios from 'axios';
 import { useCallback } from 'react';
+import firebase from 'firebase';
 import { Firestore } from '../../../services/firebase';
+import { useEffect } from 'react';
 
 const Key = '06c73d61b2e80bf877f4d9e4c88cca40'; //api key
 
 const EditAddress: FC = ({ navigation }: any) => {
     const [data, setData] = useState<any>([]);
 
-
     const onSearch = useCallback((search) => {
         axios
             .get(
                 `http://api.positionstack.com/v1/forward?access_key=${Key}&query=${search}`
             )
-            .then(( {data} ) => {
-                
+            .then(({ data }) => {
                 setData(data.data);
-                
             });
     }, []);
 
     const renderAddress = ({ item }: any) => {
-        console.log({item});
-        
+        console.log({ item });
+
         const location = `${item.label}`;
         return (
             <TouchableOpacity
                 style={styles.field}
                 onPress={() => {
+                    const currentUser = firebase.auth().currentUser;
+                    const userId = currentUser?.uid;
+                    const geolocation = {
+                        latitude: item.latitude,
+                        longitude: item.longitude
+                    };
                     Firestore.collection('address_book')
-                        .add({ location })
+                        .add({ location, userId, geolocation })
                         .then((res) => {
                             console.log(res);
                         })
@@ -67,7 +72,7 @@ const EditAddress: FC = ({ navigation }: any) => {
                         style={{
                             paddingLeft: 8,
                             paddingTop: 2,
-                            fontSize: 12,
+                            fontSize: 12
                             //width: '95%'
                         }}
                         numberOfLines={1}

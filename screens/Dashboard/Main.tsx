@@ -118,7 +118,7 @@ const Dashboard = ({ navigation, route }: any) => {
                         <View style={styles.requestList}>
                             <NoRequest />
 
-                            <RequestList />
+                            {/* <RequestList /> */}
                         </View>
 
                         <Overlay
